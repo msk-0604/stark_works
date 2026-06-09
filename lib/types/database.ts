@@ -11,9 +11,32 @@ export interface Worker {
   phone: string | null;
   email: string | null;
   position: string | null;
+  qualifications: string[];
   is_active: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface WorkerTodaySchedule {
+  id: string;
+  title: string;
+  start_time: string;
+  end_time: string;
+  site_id: string;
+  site_name: string;
+}
+
+export interface WorkerSiteHistory {
+  site_id: string;
+  site_name: string;
+  site_status: SiteStatus;
+  assigned_at: string;
+}
+
+export interface WorkerWithOverview extends Worker {
+  today_schedule_count: number;
+  today_schedules: WorkerTodaySchedule[];
+  site_history: WorkerSiteHistory[];
 }
 
 export interface Site {
@@ -87,4 +110,43 @@ export interface Schedule {
   updated_at: string;
   site?: Site;
   worker?: Worker;
+}
+
+export interface DelayedSite extends SiteWithProgress {
+  delay_reason: string;
+}
+
+export interface PersonnelAssignment {
+  schedule_id: string;
+  site_id: string;
+  site_name: string;
+  site_address: string | null;
+  site_phone: string | null;
+  title: string;
+  start_time: string;
+  end_time: string;
+}
+
+export interface TodayPersonnel {
+  worker_id: string;
+  worker_name: string;
+  worker_phone: string | null;
+  assignments: PersonnelAssignment[];
+}
+
+export interface MorningBriefing {
+  workerCount: number;
+  scheduleCount: number;
+  siteCount: number;
+  delayedCount: number;
+  workerNames: string[];
+  siteNames: string[];
+  nextUp?: {
+    worker_name: string;
+    site_name: string;
+    title: string;
+    time_label: string;
+  };
+  topSite?: { name: string; progress: number };
+  worstSite?: { name: string; progress: number };
 }

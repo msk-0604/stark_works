@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 
 import { NextTasks } from "@/components/sites/next-tasks";
-import { PhotoGallery } from "@/components/sites/photo-gallery";
+import { PhotoTimeline } from "@/components/sites/photo-timeline";
 import { ProgressBar } from "@/components/sites/progress-bar";
 import { SiteInfoActions } from "@/components/sites/site-info-actions";
 import { SiteQuickActions } from "@/components/sites/site-quick-actions";
@@ -64,10 +64,10 @@ export default async function SiteDetailPage({ params }: SiteDetailPageProps) {
 
       <Card className="border-2" id="photos">
         <CardHeader>
-          <CardTitle>現場写真</CardTitle>
+          <CardTitle className="text-2xl">写真タイムライン</CardTitle>
         </CardHeader>
         <CardContent>
-          <PhotoGallery siteId={id} initialPhotos={photos} />
+          <PhotoTimeline siteId={id} initialPhotos={photos} />
         </CardContent>
       </Card>
 

@@ -1,14 +1,19 @@
-import { SiteCard } from "@/components/sites/site-card";
 import { EmptyState } from "@/components/shared/empty-state";
+import { SiteCard } from "@/components/sites/site-card";
 import type { SiteWithProgress } from "@/lib/types/database";
 
 interface SiteListProps {
   sites: SiteWithProgress[];
+  emptyMessage?: string;
 }
 
-export function SiteList({ sites }: SiteListProps) {
+export function SiteList({ sites, emptyMessage }: SiteListProps) {
   if (sites.length === 0) {
-    return <EmptyState message="現場が登録されていません。新規登録してください。" />;
+    return (
+      <EmptyState
+        message={emptyMessage ?? "現場が登録されていません。新規登録してください。"}
+      />
+    );
   }
 
   return (

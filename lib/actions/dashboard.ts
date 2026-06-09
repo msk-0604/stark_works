@@ -2,8 +2,9 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import type { Schedule, SiteWithProgress } from "@/lib/types/database";
+import type { DelayedSite, MorningBriefing, Schedule, Site, SiteWithProgress, TodayPersonnel, Worker } from "@/lib/types/database";
 import { getSites } from "@/lib/actions/sites";
+import { formatTimeRange } from "@/lib/utils/date";
 
 export interface DashboardStats {
   todaySites: number;
@@ -58,6 +59,142 @@ export async function getTodaySchedules(): Promise<Schedule[]> {
 
   if (error || !data) return [];
   return data;
+}
+
+function unwrapRelation<T>(value: T | T[] | null | undefined): T | null {
+  if (!value) return null;
+  return Array.isArray(value) ? (value[0] ?? null) : value;
+}
+
+function getDelayReason(site: SiteWithProgress): string | null {
+  if (site.status === "completed") return null;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (site.expected_end_date) {
+    const end = new Date(site.expected_end_date);
+    end.setHours(0, 0, 0, 0);
+    const daysLeft = Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (daysLeft < 0) {
+      return `工期を${Math.abs(daysLeft)}日超過（${site.progress_percent}%）`;
+    }
+    if (daysLeft <= 7 && site.progress_percent < 70) {
+      return `残り${daysLeft}日・進捗${site.progress_percent}%`;
+    }
+  }
+
+  if (site.progress_percent < 40 && site.status === "in_progress") {
+    return `進捗${site.progress_percent}%・要フォロー`;
+  }
+
+  return null;
+}
+
+export async function getDelayedSites(): Promise<DelayedSite[]> {
+  const sites = await getSites();
+  return sites
+    .map((site) => {
+      const reason = getDelayReason(site);
+      if (!reason) return null;
+      return { ...site, delay_reason: reason };
+    })
+    .filter((s): s is DelayedSite => s !== null)
+    .sort((a, b) => a.progress_percent - b.progress_percent);
+}
+
+export async function getTodayPersonnel(): Promise<TodayPersonnel[]> {
+  const schedules = await getTodaySchedules();
+  const groups = new Map<string, TodayPersonnel>();
+
+  for (const s of schedules) {
+    const worker = unwrapRelation(s.worker as Worker | Worker[] | null);
+    const site = unwrapRelation(s.site as Site | Site[] | null);
+
+    const workerId = s.worker_id;
+    const existing = groups.get(workerId) ?? {
+      worker_id: workerId,
+      worker_name: worker?.full_name ?? "作業員",
+      worker_phone: worker?.phone ?? null,
+      assignments: [],
+    };
+
+    existing.assignments.push({
+      schedule_id: s.id,
+      site_id: s.site_id,
+      site_name: site?.name ?? "現場",
+      site_address: site?.address ?? null,
+      site_phone: site?.phone ?? null,
+      title: s.title,
+      start_time: s.start_time,
+      end_time: s.end_time,
+    });
+
+    groups.set(workerId, existing);
+  }
+
+  return [...groups.values()].sort((a, b) => a.worker_name.localeCompare(b.worker_name, "ja"));
+}
+
+export async function getMorningBriefing(): Promise<MorningBriefing> {
+  const [schedules, ranking, delayed] = await Promise.all([
+    getTodaySchedules(),
+    getProgressRanking(),
+    getDelayedSites(),
+  ]);
+
+  const workerNames = [
+    ...new Set(
+      schedules
+        .map((s) => unwrapRelation(s.worker as Worker | Worker[] | null)?.full_name)
+        .filter(Boolean) as string[]
+    ),
+  ];
+  const siteNames = [
+    ...new Set(
+      schedules
+        .map((s) => unwrapRelation(s.site as Site | Site[] | null)?.name)
+        .filter(Boolean) as string[]
+    ),
+  ];
+
+  const now = new Date();
+  const sorted = [...schedules].sort(
+    (a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+  );
+  const currentOrNext =
+    sorted.find((s) => new Date(s.end_time) >= now) ?? sorted[0];
+
+  let nextUp: MorningBriefing["nextUp"];
+  if (currentOrNext) {
+    const worker = unwrapRelation(currentOrNext.worker as Worker | Worker[] | null);
+    const site = unwrapRelation(currentOrNext.site as Site | Site[] | null);
+    nextUp = {
+      worker_name: worker?.full_name ?? "作業員",
+      site_name: site?.name ?? "現場",
+      title: currentOrNext.title,
+      time_label: formatTimeRange(currentOrNext.start_time, currentOrNext.end_time),
+    };
+  }
+
+  const top = ranking[0];
+  const worst = ranking[ranking.length - 1];
+
+  return {
+    workerCount: workerNames.length,
+    scheduleCount: schedules.length,
+    siteCount: siteNames.length,
+    delayedCount: delayed.length,
+    workerNames,
+    siteNames,
+    nextUp,
+    topSite: top ? { name: top.name, progress: top.progress_percent } : undefined,
+    worstSite:
+      worst && worst.id !== top?.id
+        ? { name: worst.name, progress: worst.progress_percent }
+        : undefined,
+  };
 }
 
 export async function getProgressRanking(): Promise<SiteWithProgress[]> {

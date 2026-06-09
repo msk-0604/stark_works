@@ -1,8 +1,7 @@
-"use client";
-
 import { Camera, CheckCircle, MapPin, Phone } from "lucide-react";
 
 import type { Site } from "@/lib/types/database";
+import { mapsHref, telHref } from "@/lib/utils/contact";
 
 interface SiteQuickActionsProps {
   site: Site;
@@ -30,15 +29,13 @@ export function SiteQuickActions({ site, nextTaskId }: SiteQuickActionsProps) {
     site.phone && {
       icon: Phone,
       label: "電話する",
-      onClick: () => { window.location.href = `tel:${site.phone!.replace(/-/g, "")}`; },
+      onClick: () => { window.location.href = telHref(site.phone!); },
       color: "bg-blue-700 text-white",
     },
     site.address && {
       icon: MapPin,
       label: "Googleマップ",
-      onClick: () => {
-        window.open(`https://maps.google.com/?q=${encodeURIComponent(site.address!)}`, "_blank");
-      },
+      onClick: () => { window.open(mapsHref(site.address!), "_blank"); },
       color: "bg-emerald-700 text-white",
     },
     {

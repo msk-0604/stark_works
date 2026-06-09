@@ -5,6 +5,7 @@ export const workerSchema = z.object({
   phone: z.string().optional(),
   email: z.string().email("正しいメールアドレスを入力してください").optional().or(z.literal("")),
   position: z.string().optional(),
+  qualifications: z.array(z.string()).default([]),
 });
 
 export type WorkerFormData = z.infer<typeof workerSchema>;

@@ -14,11 +14,11 @@ INSERT INTO organizations (id, name) VALUES
   ('11111111-1111-1111-1111-111111111111', '滋賀設備工業株式会社')
 ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
 
--- 作業員（3名）
-INSERT INTO workers (id, organization_id, full_name, phone, email, position) VALUES
-  ('22222222-2222-2222-2222-222222222201', '11111111-1111-1111-1111-111111111111', '山本 真樹', '090-1111-2222', 'yamamoto@shiga-demo.jp', '現場責任者'),
-  ('22222222-2222-2222-2222-222222222202', '11111111-1111-1111-1111-111111111111', '田中 一郎', '090-3333-4444', 'tanaka@shiga-demo.jp', '配管工'),
-  ('22222222-2222-2222-2222-222222222203', '11111111-1111-1111-1111-111111111111', '鈴木 太郎', '090-5555-6666', 'suzuki@shiga-demo.jp', '設備工');
+-- 作業員（3名・資格付き）
+INSERT INTO workers (id, organization_id, full_name, phone, email, position, qualifications) VALUES
+  ('22222222-2222-2222-2222-222222222201', '11111111-1111-1111-1111-111111111111', '山本 真樹', '090-1111-2222', 'yamamoto@shiga-demo.jp', '現場責任者', ARRAY['給水装置工事主任技術者', '排水設備工事責任技術者']),
+  ('22222222-2222-2222-2222-222222222202', '11111111-1111-1111-1111-111111111111', '田中 一郎', '090-3333-4444', 'tanaka@shiga-demo.jp', '配管工', ARRAY['内管施工技能士', '排水設備工事責任技術者']),
+  ('22222222-2222-2222-2222-222222222203', '11111111-1111-1111-1111-111111111111', '鈴木 太郎', '090-5555-6666', 'suzuki@shiga-demo.jp', '設備工', ARRAY['給水装置工事主任技術者', '第二種電気工事士']);
 
 -- 現場（3件・進捗 80% / 55% / 20%）
 INSERT INTO sites (id, organization_id, name, customer_name, address, phone, start_date, expected_end_date, manager_id, status) VALUES
