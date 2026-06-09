@@ -86,12 +86,13 @@ export function TaskChecklist({ siteId, initialTasks }: TaskChecklistProps) {
 
           <div className="mt-3">
             {!task.is_completed ? (
-              <Button
-                size="lg"
-                onClick={() => handleComplete(task.id)}
-                disabled={loadingId === task.id}
-                className="w-full text-xl tap-scale"
-              >
+            <Button
+              size="lg"
+              data-task-complete={task.id}
+              onClick={() => handleComplete(task.id)}
+              disabled={loadingId === task.id}
+              className="w-full text-xl tap-scale"
+            >
                 <Check className="mr-2 h-7 w-7" />
                 完了
               </Button>

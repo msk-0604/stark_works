@@ -50,3 +50,16 @@ export function getMonthDates(year: number, month: number): (Date | null)[][] {
 }
 
 export const WEEKDAY_LABELS = ["月", "火", "水", "木", "金", "土", "日"];
+
+export function formatTimeRange(start: string, end: string): string {
+  const s = new Date(start);
+  const e = new Date(end);
+  const fmt = (d: Date) => `${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`;
+  return `${fmt(s)}〜${fmt(e)}`;
+}
+
+export function getTodayLabel(): string {
+  const d = new Date();
+  const days = ["日", "月", "火", "水", "木", "金", "土"];
+  return `${d.getMonth() + 1}月${d.getDate()}日（${days[d.getDay()]}）`;
+}

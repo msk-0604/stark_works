@@ -5,7 +5,9 @@ import { Pencil } from "lucide-react";
 import { PhotoGallery } from "@/components/sites/photo-gallery";
 import { ProgressBar } from "@/components/sites/progress-bar";
 import { SiteInfoActions } from "@/components/sites/site-info-actions";
+import { SiteQuickActions } from "@/components/sites/site-quick-actions";
 import { TaskChecklist } from "@/components/sites/task-checklist";
+import { TodayTasks } from "@/components/sites/today-tasks";
 import { getPhotos } from "@/lib/actions/photos";
 import { PageHeader } from "@/components/shared/page-header";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -30,7 +32,7 @@ export default async function SiteDetailPage({ params }: SiteDetailPageProps) {
   const nextTask = tasks.find((t) => !t.is_completed);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 pb-24 md:pb-5">
       <PageHeader
         title={site.name}
         backHref="/sites"
@@ -45,38 +47,33 @@ export default async function SiteDetailPage({ params }: SiteDetailPageProps) {
         }
       />
 
-      <Card className="border-2 border-primary/30 bg-accent/30">
+      <SiteQuickActions site={site} nextTaskId={nextTask?.id} />
+
+      <TodayTasks siteId={id} tasks={tasks} />
+
+      <Card className="border-2">
         <CardContent className="space-y-3 p-5">
           <div className="flex items-center justify-between">
             <span className="text-lg font-bold">進捗</span>
             <StatusBadge status={site.status} />
           </div>
           <ProgressBar percent={progress} size="lg" />
-          <p className="text-lg font-semibold">
-            {completed} / {tasks.length} 作業完了
-          </p>
-          {nextTask && (
-            <p className="text-base text-muted-foreground">
-              次の作業: <span className="font-bold text-foreground">{nextTask.title}</span>
-            </p>
-          )}
+          <p className="text-lg font-semibold">{completed} / {tasks.length} 作業完了</p>
         </CardContent>
       </Card>
 
       <Card className="border-2">
         <CardHeader>
-          <CardTitle>作業チェックリスト</CardTitle>
-          <p className="text-lg text-muted-foreground">終わったら「完了」を押してください</p>
+          <CardTitle>作業の詳細</CardTitle>
         </CardHeader>
         <CardContent>
           <TaskChecklist siteId={id} initialTasks={tasks} />
         </CardContent>
       </Card>
 
-      <Card className="border-2">
+      <Card className="border-2" id="photos">
         <CardHeader>
           <CardTitle>現場写真</CardTitle>
-          <p className="text-lg text-muted-foreground">「写真を撮る」でカメラが開きます</p>
         </CardHeader>
         <CardContent>
           <PhotoGallery siteId={id} initialPhotos={photos} />

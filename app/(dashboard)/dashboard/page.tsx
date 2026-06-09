@@ -1,13 +1,17 @@
 import Link from "next/link";
 
 import { DashboardStats } from "@/components/dashboard/dashboard-stats";
-import { QuickActions } from "@/components/dashboard/quick-actions";
-import { HelpBanner } from "@/components/shared/help-banner";
+import { ProgressRanking } from "@/components/dashboard/progress-ranking";
+import { TodaySchedule } from "@/components/dashboard/today-schedule";
 import { Button } from "@/components/ui/button";
-import { getDashboardStats } from "@/lib/actions/dashboard";
+import { getDashboardStats, getProgressRanking, getTodaySchedules } from "@/lib/actions/dashboard";
 
 export default async function DashboardPage() {
-  const stats = await getDashboardStats();
+  const [stats, todaySchedules, ranking] = await Promise.all([
+    getDashboardStats(),
+    getTodaySchedules(),
+    getProgressRanking(),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -16,14 +20,14 @@ export default async function DashboardPage() {
         <p className="mt-1 text-xl text-muted-foreground">今日の現場の状況</p>
       </div>
 
-      <DashboardStats {...stats} />
+      <TodaySchedule schedules={todaySchedules} />
+
+      <ProgressRanking sites={ranking} />
 
       <div>
-        <h2 className="mb-3 text-xl font-bold">よく使う機能</h2>
-        <QuickActions />
+        <h2 className="mb-3 text-lg font-bold text-muted-foreground">サマリー</h2>
+        <DashboardStats {...stats} />
       </div>
-
-      <HelpBanner text="現場をタップ → 作業の「完了」ボタンを押す → 写真を撮る、の順で使います。" />
 
       <Button asChild size="lg" className="w-full tap-scale">
         <Link href="/sites">現場一覧を見る</Link>
