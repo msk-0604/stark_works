@@ -14,7 +14,7 @@ export function FloatingActionButton({ href, label, className }: FloatingActionB
     <Link
       href={href}
       className={cn(
-        "tap-scale fixed bottom-[calc(var(--nav-height)+1rem)] right-4 z-40 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg md:hidden",
+        "tap-scale fixed bottom-[calc(var(--nav-height)+1rem)] right-4 z-40 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg",
         className
       )}
       aria-label={label}

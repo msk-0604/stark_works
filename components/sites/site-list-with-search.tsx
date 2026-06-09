@@ -34,7 +34,12 @@ export function SiteListWithSearch({ sites }: SiteListWithSearchProps) {
         resultCount={filtered.length}
         totalCount={sites.length}
       />
-      <SiteList sites={filtered} emptyMessage={query ? "該当する現場がありません" : undefined} />
+      <SiteList
+        sites={filtered}
+        emptyMessage={query ? "該当する現場がありません" : undefined}
+        emptyActionHref={sites.length === 0 && !query ? "/sites/new" : undefined}
+        emptyActionLabel={sites.length === 0 && !query ? "現場を登録する" : undefined}
+      />
     </div>
   );
 }
