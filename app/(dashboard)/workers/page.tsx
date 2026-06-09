@@ -1,5 +1,6 @@
 import { WorkerList } from "@/components/workers/worker-list";
 import { WorkersSummary } from "@/components/workers/workers-summary";
+import { AddButton } from "@/components/shared/add-button";
 import { FloatingActionButton } from "@/components/shared/floating-action-button";
 import { PageHeader } from "@/components/shared/page-header";
 import { getWorkersOverview } from "@/lib/actions/workers";
@@ -17,6 +18,8 @@ export default async function WorkersPage() {
       <p className="-mt-3 text-lg text-muted-foreground">
         誰がどこで何をしているか、すぐに把握できます
       </p>
+
+      <AddButton href="/workers/new" label="作業員を登録する" />
 
       {workers.length > 0 && <WorkersSummary workers={workers} />}
 

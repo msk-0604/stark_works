@@ -18,9 +18,12 @@ export function MobileNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 border-t-2 border-border bg-card/95 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-sm md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t-4 border-primary bg-card shadow-[0_-6px_24px_rgba(0,0,0,0.15)] md:hidden"
       aria-label="メインメニュー"
     >
+      <p className="bg-primary py-1 text-center text-sm font-bold text-primary-foreground">
+        メニュー
+      </p>
       <div className="grid grid-cols-4 safe-bottom">
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive = pathname.startsWith(href);

@@ -17,10 +17,10 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-64 shrink-0 border-r-2 border-border bg-card md:block">
-      <div className="p-6">
+    <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r-4 border-primary bg-card md:block">
+      <div className="border-b-2 border-primary/20 bg-primary/5 p-6">
         <h1 className="text-2xl font-bold text-primary">Stark Works</h1>
-        <p className="mt-1 text-sm text-muted-foreground">現場進捗管理</p>
+        <p className="mt-1 text-base font-semibold text-muted-foreground">メニュー</p>
       </div>
       <nav className="flex flex-col gap-1 px-3">
         {navItems.map(({ href, label, icon: Icon }) => {

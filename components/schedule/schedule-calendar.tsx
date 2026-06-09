@@ -26,13 +26,14 @@ interface ScheduleCalendarProps {
   schedules: Schedule[];
   sites: Site[];
   workers: Worker[];
+  defaultShowForm?: boolean;
 }
 
-export function ScheduleCalendar({ schedules, sites, workers }: ScheduleCalendarProps) {
+export function ScheduleCalendar({ schedules, sites, workers, defaultShowForm = false }: ScheduleCalendarProps) {
   const router = useRouter();
   const [view, setView] = useState<ViewMode>("week");
   const [current, setCurrent] = useState(new Date());
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(defaultShowForm);
   const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
 
   const today = formatDate(new Date());
@@ -138,13 +139,13 @@ export function ScheduleCalendar({ schedules, sites, workers }: ScheduleCalendar
         </div>
       )}
 
-      <Button size="lg" className="w-full text-lg" onClick={() => setShowForm(!showForm)}>
+      <Button size="lg" className="w-full min-h-[72px] text-xl" onClick={() => setShowForm(true)}>
         <Plus className="mr-2 h-6 w-6" />
         予定を追加
       </Button>
 
       {showForm && (
-        <Card>
+        <Card id="add-schedule">
           <CardContent className="pt-6">
             <ScheduleForm
               sites={sites}
