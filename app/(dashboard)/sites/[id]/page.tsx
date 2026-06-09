@@ -2,12 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 
+import { NextTasks } from "@/components/sites/next-tasks";
 import { PhotoGallery } from "@/components/sites/photo-gallery";
 import { ProgressBar } from "@/components/sites/progress-bar";
 import { SiteInfoActions } from "@/components/sites/site-info-actions";
 import { SiteQuickActions } from "@/components/sites/site-quick-actions";
 import { TaskChecklist } from "@/components/sites/task-checklist";
-import { TodayTasks } from "@/components/sites/today-tasks";
 import { getPhotos } from "@/lib/actions/photos";
 import { PageHeader } from "@/components/shared/page-header";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -32,13 +32,13 @@ export default async function SiteDetailPage({ params }: SiteDetailPageProps) {
   const nextTask = tasks.find((t) => !t.is_completed);
 
   return (
-    <div className="space-y-5 pb-24 md:pb-5">
+    <div className="space-y-5 pb-32 md:pb-5">
       <PageHeader
         title={site.name}
         backHref="/sites"
         subtitle={site.customer_name ?? undefined}
         action={
-          <Button asChild variant="outline" size="lg" className="tap-scale">
+          <Button asChild variant="outline" size="lg" className="min-h-[68px] tap-scale">
             <Link href={`/sites/${id}/edit`}>
               <Pencil className="mr-2 h-5 w-5" />
               現場を編集
@@ -49,25 +49,16 @@ export default async function SiteDetailPage({ params }: SiteDetailPageProps) {
 
       <SiteQuickActions site={site} nextTaskId={nextTask?.id} />
 
-      <TodayTasks siteId={id} tasks={tasks} />
+      <NextTasks siteId={id} tasks={tasks} />
 
-      <Card className="border-2">
+      <Card className="border-2 border-slate-400">
         <CardContent className="space-y-3 p-5">
           <div className="flex items-center justify-between">
-            <span className="text-lg font-bold">進捗</span>
+            <span className="text-xl font-bold">進捗状況</span>
             <StatusBadge status={site.status} />
           </div>
           <ProgressBar percent={progress} size="lg" />
           <p className="text-lg font-semibold">{completed} / {tasks.length} 作業完了</p>
-        </CardContent>
-      </Card>
-
-      <Card className="border-2">
-        <CardHeader>
-          <CardTitle>作業の詳細</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <TaskChecklist siteId={id} initialTasks={tasks} />
         </CardContent>
       </Card>
 
@@ -77,6 +68,15 @@ export default async function SiteDetailPage({ params }: SiteDetailPageProps) {
         </CardHeader>
         <CardContent>
           <PhotoGallery siteId={id} initialPhotos={photos} />
+        </CardContent>
+      </Card>
+
+      <Card className="border-2">
+        <CardHeader>
+          <CardTitle>作業の詳細</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <TaskChecklist siteId={id} initialTasks={tasks} />
         </CardContent>
       </Card>
 

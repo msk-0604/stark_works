@@ -65,5 +65,5 @@ export async function getProgressRanking(): Promise<SiteWithProgress[]> {
   return sites
     .filter((s) => s.status !== "completed" && s.task_count > 0)
     .sort((a, b) => b.progress_percent - a.progress_percent)
-    .slice(0, 5);
+    .slice(0, 3);
 }

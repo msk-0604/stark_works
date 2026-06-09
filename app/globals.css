@@ -25,24 +25,24 @@
 
 :root {
   --radius: 0.75rem;
-  --background: #f1f5f9;
-  --foreground: #0f172a;
+  --background: #e8edf3;
+  --foreground: #0a0f1a;
   --card: #ffffff;
-  --card-foreground: #0f172a;
-  --primary: #1d4ed8;
+  --card-foreground: #0a0f1a;
+  --primary: #1e40af;
   --primary-foreground: #ffffff;
-  --secondary: #e2e8f0;
-  --secondary-foreground: #1e293b;
+  --secondary: #dbe4ef;
+  --secondary-foreground: #0a0f1a;
   --muted: #f1f5f9;
-  --muted-foreground: #475569;
+  --muted-foreground: #334155;
   --accent: #dbeafe;
   --accent-foreground: #1e3a8a;
-  --destructive: #dc2626;
-  --border: #94a3b8;
-  --input: #94a3b8;
-  --ring: #2563eb;
+  --destructive: #b91c1c;
+  --border: #64748b;
+  --input: #64748b;
+  --ring: #1d4ed8;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --nav-height: calc(4.5rem + var(--safe-bottom));
+  --nav-height: calc(4.75rem + var(--safe-bottom));
 }
 
 @layer base {
@@ -58,7 +58,7 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-size: 18px;
-    line-height: 1.7;
+    line-height: 1.75;
     overflow-x: hidden;
     padding-bottom: var(--safe-bottom);
   }
@@ -66,9 +66,9 @@
   h1, h2, h3 {
     @apply font-bold;
     letter-spacing: 0.02em;
+    color: var(--foreground);
   }
 
-  /* タップ時のハイライトを控えめに */
   button, a {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
@@ -82,11 +82,6 @@
 
   .safe-bottom {
     padding-bottom: var(--safe-bottom);
-  }
-
-  .touch-target {
-    min-height: 48px;
-    min-width: 48px;
   }
 
   .tap-scale {
