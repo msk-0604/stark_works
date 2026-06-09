@@ -7,6 +7,7 @@ import { DEMO_ORG_ID } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import type { SiteStatus, Worker, WorkerSiteHistory, WorkerTodaySchedule, WorkerWithOverview } from "@/lib/types/database";
+import { toUserFacingDbError } from "@/lib/utils/supabase-error";
 import { workerSchema } from "@/lib/validations/worker";
 
 export type ActionResult<T> = { success: true; data: T } | { success: false; error: string };
@@ -144,7 +145,9 @@ export async function createWorker(formData: FormData): Promise<ActionResult<nev
     qualifications: parsed.data.qualifications,
   });
 
-  if (error) return { success: false, error: "作業員の登録に失敗しました" };
+  if (error) {
+    return { success: false, error: toUserFacingDbError("作業員の登録に失敗しました", error) };
+  }
 
   revalidatePath("/workers");
   revalidatePath("/dashboard");

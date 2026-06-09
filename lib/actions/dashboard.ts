@@ -134,7 +134,7 @@ export async function getTodayPersonnel(): Promise<TodayPersonnel[]> {
     groups.set(workerId, existing);
   }
 
-  return [...groups.values()].sort((a, b) => a.worker_name.localeCompare(b.worker_name, "ja"));
+  return [...groups.values()].sort((a, b) => a.worker_name.localeCompare(b.worker_name));
 }
 
 export async function getMorningBriefing(): Promise<MorningBriefing> {

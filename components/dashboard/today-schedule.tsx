@@ -3,8 +3,9 @@ import { Calendar, ChevronRight, HardHat, User } from "lucide-react";
 
 import { QuickContactButtons } from "@/components/shared/quick-contact-buttons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Schedule } from "@/lib/types/database";
+import type { Schedule, Site, Worker } from "@/lib/types/database";
 import { formatTimeRange, getTodayLabel } from "@/lib/utils/date";
+import { unwrapRelation } from "@/lib/utils/unwrap-relation";
 
 interface TodayScheduleProps {
   schedules: Schedule[];
@@ -29,7 +30,10 @@ export function TodaySchedule({ schedules }: TodayScheduleProps) {
         {schedules.length === 0 ? (
           <p className="py-6 text-center text-lg text-muted-foreground">本日の予定はありません</p>
         ) : (
-          schedules.map((s) => (
+          schedules.map((s) => {
+            const worker = unwrapRelation(s.worker as Worker | Worker[] | null);
+            const site = unwrapRelation(s.site as Site | Site[] | null);
+            return (
             <div
               key={s.id}
               className="rounded-xl border-2 border-slate-300 bg-white p-4"
@@ -42,11 +46,11 @@ export function TodaySchedule({ schedules }: TodayScheduleProps) {
                     </p>
                     <p className="flex items-center gap-2 text-xl font-bold">
                       <User className="h-6 w-6 shrink-0" />
-                      {s.worker?.full_name ?? "作業員"}
+                      {worker?.full_name ?? "作業員"}
                     </p>
                     <p className="flex items-center gap-2 text-xl">
                       <HardHat className="h-6 w-6 shrink-0 text-muted-foreground" />
-                      {s.site?.name ?? "現場"}
+                      {site?.name ?? "現場"}
                     </p>
                     <p className="rounded-lg bg-slate-100 px-3 py-2 text-xl font-semibold">
                       {s.title}
@@ -56,13 +60,14 @@ export function TodaySchedule({ schedules }: TodayScheduleProps) {
                 </div>
               </Link>
               <QuickContactButtons
-                phone={s.worker?.phone}
-                address={s.site?.address}
+                phone={worker?.phone}
+                address={site?.address}
                 phoneLabel="作業員に電話"
                 className="mt-3"
               />
             </div>
-          ))
+          );
+          })
         )}
       </CardContent>
     </Card>
