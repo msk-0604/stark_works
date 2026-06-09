@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { DEMO_ORG_ID } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { getSupabaseConfig, isSupabaseConfigured } from "@/lib/supabase/config";
 import type { Photo, PhotoCategory } from "@/lib/types/database";
 
 export type ActionResult<T> = { success: true; data: T } | { success: false; error: string };
@@ -21,7 +21,7 @@ export async function getPhotos(siteId: string): Promise<Photo[]> {
 
   if (error || !data) return [];
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const { url } = getSupabaseConfig();
   return data.map((photo) => ({
     ...photo,
     url: `${url}/storage/v1/object/public/site-photos/${photo.storage_path}`,
@@ -76,7 +76,7 @@ export async function uploadPhoto(
   }
 
   revalidatePath(`/sites/${siteId}`);
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const { url } = getSupabaseConfig();
   return {
     success: true,
     data: { ...data, url: `${url}/storage/v1/object/public/site-photos/${storagePath}` },
