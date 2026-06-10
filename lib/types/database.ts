@@ -61,6 +61,14 @@ export interface SiteWithProgress extends Site {
   progress_percent: number;
 }
 
+export interface SiteListItem extends SiteWithProgress {
+  assignee_name: string | null;
+  assignee_names: string[];
+  today_worker_count: number;
+  is_overdue: boolean;
+  is_active_today: boolean;
+}
+
 export interface Task {
   id: string;
   site_id: string;

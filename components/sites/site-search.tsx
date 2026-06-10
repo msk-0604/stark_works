@@ -20,7 +20,7 @@ export function SiteSearch({ value, onChange, resultCount, totalCount }: SiteSea
           type="search"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="現場名・顧客名・住所で検索"
+          placeholder="現場名・顧客名・住所・担当者で検索"
           className="min-h-[64px] pl-14 pr-14 text-xl"
           aria-label="現場を検索"
         />

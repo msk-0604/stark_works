@@ -1,9 +1,9 @@
 import { EmptyState } from "@/components/shared/empty-state";
 import { SiteCard } from "@/components/sites/site-card";
-import type { SiteWithProgress } from "@/lib/types/database";
+import type { SiteListItem } from "@/lib/types/database";
 
 interface SiteListProps {
-  sites: SiteWithProgress[];
+  sites: SiteListItem[];
   emptyMessage?: string;
   emptyActionHref?: string;
   emptyActionLabel?: string;

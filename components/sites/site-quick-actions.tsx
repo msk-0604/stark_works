@@ -1,3 +1,5 @@
+"use client";
+
 import { Camera, CheckCircle, MapPin, Phone } from "lucide-react";
 
 import type { Site } from "@/lib/types/database";

@@ -6,8 +6,10 @@ import { redirect } from "next/navigation";
 import { DEMO_ORG_ID } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import type { Site, SiteWithProgress } from "@/lib/types/database";
+import type { Site, SiteListItem, SiteWithProgress, Worker } from "@/lib/types/database";
 import { calcProgress } from "@/lib/utils/progress";
+import { isSiteOverdue } from "@/lib/utils/site";
+import { unwrapRelation } from "@/lib/utils/unwrap-relation";
 import { siteSchema } from "@/lib/validations/site";
 
 export type ActionResult<T> = { success: true; data: T } | { success: false; error: string };
@@ -44,6 +46,64 @@ export async function getSites(): Promise<SiteWithProgress[]> {
       task_count: counts.total,
       completed_count: counts.completed,
       progress_percent: calcProgress(counts.completed, counts.total),
+    };
+  });
+}
+
+export async function getSitesForList(): Promise<SiteListItem[]> {
+  const sites = await getSites();
+  if (sites.length === 0 || !isSupabaseConfigured()) return [];
+
+  const supabase = await createClient();
+  const today = new Date().toISOString().split("T")[0];
+
+  const [schedulesResult, assignmentsResult] = await Promise.all([
+    supabase
+      .from("schedules")
+      .select("site_id, worker_id, worker:workers(full_name)")
+      .gte("start_time", `${today}T00:00:00`)
+      .lte("start_time", `${today}T23:59:59`),
+    supabase
+      .from("site_assignments")
+      .select("site_id, worker:workers(full_name)"),
+  ]);
+
+  const todayWorkersBySite = new Map<string, { count: number; names: string[] }>();
+  for (const row of schedulesResult.data ?? []) {
+    const worker = unwrapRelation(row.worker as { full_name: string } | { full_name: string }[] | null);
+    const entry = todayWorkersBySite.get(row.site_id) ?? { count: 0, names: [] };
+    if (worker?.full_name && !entry.names.includes(worker.full_name)) {
+      entry.names.push(worker.full_name);
+      entry.count++;
+    }
+    todayWorkersBySite.set(row.site_id, entry);
+  }
+
+  const assigneesBySite = new Map<string, string[]>();
+  for (const row of assignmentsResult.data ?? []) {
+    const worker = unwrapRelation(row.worker as { full_name: string } | { full_name: string }[] | null);
+    if (!worker?.full_name) continue;
+    const list = assigneesBySite.get(row.site_id) ?? [];
+    if (!list.includes(worker.full_name)) list.push(worker.full_name);
+    assigneesBySite.set(row.site_id, list);
+  }
+
+  return sites.map((site) => {
+    const manager = unwrapRelation(site.manager as Worker | Worker[] | null);
+    const todayInfo = todayWorkersBySite.get(site.id) ?? { count: 0, names: [] };
+    const assigned = assigneesBySite.get(site.id) ?? [];
+    const assigneeNames = [
+      ...new Set([manager?.full_name, ...assigned].filter(Boolean) as string[]),
+    ];
+
+    return {
+      ...site,
+      manager: manager ?? site.manager,
+      assignee_name: manager?.full_name ?? assigned[0] ?? null,
+      assignee_names: assigneeNames,
+      today_worker_count: todayInfo.count,
+      is_overdue: isSiteOverdue(site.expected_end_date, site.status),
+      is_active_today: todayInfo.count > 0,
     };
   });
 }
