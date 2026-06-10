@@ -1,10 +1,10 @@
-import { ScheduleCalendar } from "@/components/schedule/schedule-calendar";
-import { AddButton } from "@/components/shared/add-button";
+import { ScheduleTodayList } from "@/components/schedule/schedule-today-list";
 import { FloatingActionButton } from "@/components/shared/floating-action-button";
 import { PageHeader } from "@/components/shared/page-header";
 import { getSchedules } from "@/lib/actions/schedules";
 import { getSites } from "@/lib/actions/sites";
 import { getWorkers } from "@/lib/actions/workers";
+import { getTodayLabel } from "@/lib/utils/date";
 
 interface SchedulePageProps {
   searchParams: Promise<{ add?: string }>;
@@ -24,9 +24,8 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
 
   return (
     <div className="space-y-4 pb-4">
-      <PageHeader title="スケジュール" subtitle="作業員の予定を登録・確認" />
-      <AddButton href="/schedule?add=1" label="予定を追加する" />
-      <ScheduleCalendar
+      <PageHeader title="予定" subtitle={getTodayLabel()} />
+      <ScheduleTodayList
         schedules={schedules}
         sites={sites}
         workers={workers}

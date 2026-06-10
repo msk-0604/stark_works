@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
 import { completeTask, createTask, deleteTask } from "@/lib/actions/tasks";
 import { Button } from "@/components/ui/button";
@@ -51,57 +51,58 @@ export function TaskChecklist({ siteId, initialTasks }: TaskChecklistProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3" id="tasks">
       {tasks.length === 0 && (
-        <p className="text-lg text-muted-foreground">作業が登録されていません</p>
+        <p className="py-4 text-center text-lg text-muted-foreground">作業が登録されていません</p>
       )}
 
       {tasks.map((task) => (
         <div
           key={task.id}
-          className="rounded-xl border-2 border-border bg-card p-4"
+          className={`flex items-center gap-3 rounded-xl border-2 p-4 ${
+            task.is_completed ? "border-green-300 bg-green-50" : "border-slate-300 bg-white"
+          }`}
         >
-          <div className="flex items-start justify-between gap-2">
-            <p className={`flex-1 text-xl font-bold leading-snug ${task.is_completed ? "text-muted-foreground line-through" : ""}`}>
-              {task.title}
-            </p>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-12 w-12 shrink-0 tap-scale"
-              onClick={() => handleDelete(task.id)}
-              disabled={loadingId === task.id}
-              aria-label="削除"
-            >
-              <Trash2 className="h-5 w-5 text-muted-foreground" />
-            </Button>
-          </div>
+          <button
+            type="button"
+            data-task-complete={task.id}
+            onClick={() => !task.is_completed && handleComplete(task.id)}
+            disabled={task.is_completed || loadingId === task.id}
+            className="tap-scale shrink-0 text-4xl leading-none disabled:cursor-default"
+            aria-label={task.is_completed ? "完了済み" : "完了にする"}
+          >
+            {task.is_completed ? "☑" : "☐"}
+          </button>
 
-          {task.is_completed && task.completed_at && (
-            <p className="mt-2 text-base text-muted-foreground">
-              完了: {new Date(task.completed_at).toLocaleString("ja-JP")}
-              {task.completed_worker && ` / ${task.completed_worker.full_name}`}
-            </p>
-          )}
+          <span
+            className={`flex-1 text-xl font-bold ${
+              task.is_completed ? "text-muted-foreground line-through" : ""
+            }`}
+          >
+            {task.title}
+          </span>
 
-          <div className="mt-3">
-            {!task.is_completed ? (
+          {!task.is_completed && (
             <Button
               size="lg"
-              data-task-complete={task.id}
               onClick={() => handleComplete(task.id)}
               disabled={loadingId === task.id}
-              className="w-full text-xl tap-scale"
+              className="min-h-[56px] shrink-0 px-5 text-lg tap-scale"
             >
-                <Check className="mr-2 h-7 w-7" />
-                完了
-              </Button>
-            ) : (
-              <div className="flex w-full items-center justify-center rounded-xl bg-green-100 py-4 text-lg font-bold text-green-800">
-                完了済み
-              </div>
-            )}
-          </div>
+              完了
+            </Button>
+          )}
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-12 w-12 shrink-0"
+            onClick={() => handleDelete(task.id)}
+            disabled={loadingId === task.id}
+            aria-label="削除"
+          >
+            <Trash2 className="h-5 w-5 text-muted-foreground" />
+          </Button>
         </div>
       ))}
 
@@ -110,9 +111,14 @@ export function TaskChecklist({ siteId, initialTasks }: TaskChecklistProps) {
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
           placeholder="作業名（例: 給水工事）"
-          className="text-lg"
+          className="h-14 text-lg"
         />
-        <Button size="lg" onClick={handleAdd} disabled={!newTitle.trim()} className="w-full text-lg tap-scale">
+        <Button
+          size="lg"
+          onClick={handleAdd}
+          disabled={!newTitle.trim()}
+          className="w-full min-h-[56px] text-lg tap-scale"
+        >
           <Plus className="mr-2 h-6 w-6" />
           作業を追加
         </Button>

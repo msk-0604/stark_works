@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { Calendar, ChevronRight, HardHat, User } from "lucide-react";
 
-import { QuickContactButtons } from "@/components/shared/quick-contact-buttons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Schedule, Site, Worker } from "@/lib/types/database";
-import { formatTimeRange, getTodayLabel } from "@/lib/utils/date";
+import { formatTimeRange } from "@/lib/utils/date";
 import { unwrapRelation } from "@/lib/utils/unwrap-relation";
 
 interface TodayScheduleProps {
@@ -24,7 +23,7 @@ export function TodaySchedule({ schedules }: TodayScheduleProps) {
             {schedules.length}件
           </span>
         </div>
-        <p className="text-lg text-muted-foreground">{getTodayLabel()} · 時間順</p>
+        <p className="text-lg text-muted-foreground">誰が・どこで・何をしているか</p>
       </CardHeader>
       <CardContent className="space-y-3">
         {schedules.length === 0 ? (
@@ -59,12 +58,6 @@ export function TodaySchedule({ schedules }: TodayScheduleProps) {
                   <ChevronRight className="mt-1 h-8 w-8 shrink-0 text-primary" />
                 </div>
               </Link>
-              <QuickContactButtons
-                phone={worker?.phone}
-                address={site?.address}
-                phoneLabel="作業員に電話"
-                className="mt-3"
-              />
             </div>
           );
           })

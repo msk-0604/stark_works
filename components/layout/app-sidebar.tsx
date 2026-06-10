@@ -7,10 +7,10 @@ import { Calendar, HardHat, Home, Users } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 const navItems = [
-  { href: "/dashboard", label: "ダッシュボード", icon: Home },
-  { href: "/sites", label: "現場管理", icon: HardHat },
-  { href: "/schedule", label: "スケジュール", icon: Calendar },
-  { href: "/workers", label: "作業員管理", icon: Users },
+  { href: "/dashboard", label: "ホーム", icon: Home },
+  { href: "/sites", label: "現場", icon: HardHat },
+  { href: "/schedule", label: "予定", icon: Calendar },
+  { href: "/workers", label: "作業員", icon: Users },
 ];
 
 export function AppSidebar() {

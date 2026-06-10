@@ -12,9 +12,6 @@ export default async function SitesPage() {
   return (
     <div className="space-y-5 pb-4">
       <PageHeader title="現場一覧" subtitle={`全 ${sites.length} 件`} />
-      <p className="-mt-2 text-xl text-muted-foreground">
-        どの現場が動いているか、10秒で把握できます
-      </p>
 
       {sites.length > 0 && <SitesOverview sites={sites} />}
 

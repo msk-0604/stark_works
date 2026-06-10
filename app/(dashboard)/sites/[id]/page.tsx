@@ -2,15 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 
-import { NextTasks } from "@/components/sites/next-tasks";
 import { PhotoTimeline } from "@/components/sites/photo-timeline";
-import { ProgressBar } from "@/components/sites/progress-bar";
-import { SiteInfoActions } from "@/components/sites/site-info-actions";
+import { SiteHeader } from "@/components/sites/site-header";
 import { SiteQuickActions } from "@/components/sites/site-quick-actions";
 import { TaskChecklist } from "@/components/sites/task-checklist";
 import { getPhotos } from "@/lib/actions/photos";
 import { PageHeader } from "@/components/shared/page-header";
-import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getSite } from "@/lib/actions/sites";
@@ -29,63 +26,43 @@ export default async function SiteDetailPage({ params }: SiteDetailPageProps) {
 
   const completed = tasks.filter((t) => t.is_completed).length;
   const progress = calcProgress(completed, tasks.length);
-  const nextTask = tasks.find((t) => !t.is_completed);
-
   return (
     <div className="space-y-5 pb-32 md:pb-5">
       <PageHeader
-        title={site.name}
+        title="現場詳細"
         backHref="/sites"
-        subtitle={site.customer_name ?? undefined}
         action={
-          <Button asChild variant="outline" size="lg" className="min-h-[68px] tap-scale">
+          <Button asChild variant="outline" size="lg" className="min-h-[56px] tap-scale">
             <Link href={`/sites/${id}/edit`}>
               <Pencil className="mr-2 h-5 w-5" />
-              現場を編集
+              編集
             </Link>
           </Button>
         }
       />
 
-      <SiteQuickActions site={site} nextTaskId={nextTask?.id} />
+      <SiteHeader site={site} progress={progress} />
 
-      <NextTasks siteId={id} tasks={tasks} />
+      <SiteQuickActions site={site} />
 
-      <Card className="border-2 border-slate-400">
-        <CardContent className="space-y-3 p-5">
-          <div className="flex items-center justify-between">
-            <span className="text-xl font-bold">進捗状況</span>
-            <StatusBadge status={site.status} />
-          </div>
-          <ProgressBar percent={progress} size="lg" />
-          <p className="text-lg font-semibold">{completed} / {tasks.length} 作業完了</p>
-        </CardContent>
-      </Card>
-
-      <Card className="border-2" id="photos">
-        <CardHeader>
-          <CardTitle className="text-2xl">写真タイムライン</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <PhotoTimeline siteId={id} initialPhotos={photos} />
-        </CardContent>
-      </Card>
-
-      <Card className="border-2">
-        <CardHeader>
-          <CardTitle>作業の詳細</CardTitle>
+      <Card className="border-2 border-primary">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-2xl">作業チェックリスト</CardTitle>
+          <p className="text-lg text-muted-foreground">
+            {completed} / {tasks.length} 完了
+          </p>
         </CardHeader>
         <CardContent>
           <TaskChecklist siteId={id} initialTasks={tasks} />
         </CardContent>
       </Card>
 
-      <Card className="border-2">
+      <Card className="border-2" id="photos">
         <CardHeader>
-          <CardTitle>現場情報</CardTitle>
+          <CardTitle className="text-2xl">写真</CardTitle>
         </CardHeader>
         <CardContent>
-          <SiteInfoActions site={site} />
+          <PhotoTimeline siteId={id} initialPhotos={photos} />
         </CardContent>
       </Card>
     </div>
