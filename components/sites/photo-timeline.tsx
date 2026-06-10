@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+
+import { backgroundRefresh } from "@/lib/utils/refresh";
 import { Camera, Trash2 } from "lucide-react";
 
 import { deletePhoto, uploadPhoto } from "@/lib/actions/photos";
@@ -50,7 +52,7 @@ export function PhotoTimeline({ siteId, initialPhotos }: PhotoTimelineProps) {
     const result = await uploadPhoto(siteId, formData);
     if (result.success) {
       setPhotos((prev) => [result.data, ...prev]);
-      router.refresh();
+      backgroundRefresh(router);
     } else {
       alert(result.error);
     }
@@ -60,9 +62,14 @@ export function PhotoTimeline({ siteId, initialPhotos }: PhotoTimelineProps) {
 
   async function handleDelete(photoId: string) {
     if (!confirm("この写真を削除しますか？")) return;
-    await deletePhoto(photoId, siteId);
+    const previous = photos;
     setPhotos((prev) => prev.filter((p) => p.id !== photoId));
-    router.refresh();
+    const result = await deletePhoto(photoId, siteId);
+    if (!result.success) {
+      setPhotos(previous);
+    } else {
+      backgroundRefresh(router);
+    }
   }
 
   return (

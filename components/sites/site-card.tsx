@@ -24,7 +24,7 @@ export function SiteCard({ site }: SiteCardProps) {
         </div>
       )}
 
-      <Link href={`/sites/${site.id}`} className="tap-scale block p-5 active:bg-slate-50">
+      <Link href={`/sites/${site.id}`} prefetch className="tap-scale block p-5 active:bg-slate-50">
         <h2 className="text-2xl font-bold leading-snug">{site.name}</h2>
 
         {site.address && (

@@ -8,46 +8,74 @@ import { completeTask, createTask, deleteTask } from "@/lib/actions/tasks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Task } from "@/lib/types/database";
+import { backgroundRefresh } from "@/lib/utils/refresh";
 
 interface TaskChecklistProps {
   siteId: string;
   initialTasks: Task[];
+  onTasksChange?: (tasks: Task[]) => void;
 }
 
-export function TaskChecklist({ siteId, initialTasks }: TaskChecklistProps) {
+export function TaskChecklist({ siteId, initialTasks, onTasksChange }: TaskChecklistProps) {
   const router = useRouter();
   const [tasks, setTasks] = useState(initialTasks);
   const [newTitle, setNewTitle] = useState("");
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
+  function updateTasks(updater: (prev: Task[]) => Task[]) {
+    setTasks((prev) => {
+      const next = updater(prev);
+      onTasksChange?.(next);
+      return next;
+    });
+  }
+
   async function handleComplete(taskId: string) {
-    setLoadingId(taskId);
-    await completeTask(taskId, siteId);
-    setTasks((prev) =>
+    const previous = tasks;
+    updateTasks((prev) =>
       prev.map((t) =>
         t.id === taskId ? { ...t, is_completed: true, completed_at: new Date().toISOString() } : t
       )
     );
+    setLoadingId(taskId);
+
+    const result = await completeTask(taskId, siteId);
+    if (!result.success) {
+      updateTasks(() => previous);
+    } else {
+      backgroundRefresh(router);
+    }
     setLoadingId(null);
-    router.refresh();
   }
 
   async function handleAdd() {
     if (!newTitle.trim()) return;
-    const result = await createTask(siteId, newTitle);
+    const title = newTitle.trim();
+    setNewTitle("");
+    setLoadingId("add");
+
+    const result = await createTask(siteId, title);
     if (result.success) {
-      setTasks((prev) => [...prev, result.data]);
-      setNewTitle("");
-      router.refresh();
+      updateTasks((prev) => [...prev, result.data]);
+      backgroundRefresh(router);
+    } else {
+      setNewTitle(title);
     }
+    setLoadingId(null);
   }
 
   async function handleDelete(taskId: string) {
+    const previous = tasks;
+    updateTasks((prev) => prev.filter((t) => t.id !== taskId));
     setLoadingId(taskId);
-    await deleteTask(taskId, siteId);
-    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+
+    const result = await deleteTask(taskId, siteId);
+    if (!result.success) {
+      updateTasks(() => previous);
+    } else {
+      backgroundRefresh(router);
+    }
     setLoadingId(null);
-    router.refresh();
   }
 
   return (
@@ -71,7 +99,7 @@ export function TaskChecklist({ siteId, initialTasks }: TaskChecklistProps) {
             className="tap-scale shrink-0 text-4xl leading-none disabled:cursor-default"
             aria-label={task.is_completed ? "完了済み" : "完了にする"}
           >
-            {task.is_completed ? "☑" : "☐"}
+            {task.is_completed ? "☑" : loadingId === task.id ? "…" : "☐"}
           </button>
 
           <span
@@ -89,7 +117,7 @@ export function TaskChecklist({ siteId, initialTasks }: TaskChecklistProps) {
               disabled={loadingId === task.id}
               className="min-h-[56px] shrink-0 px-5 text-lg tap-scale"
             >
-              完了
+              {loadingId === task.id ? "…" : "完了"}
             </Button>
           )}
 
@@ -112,15 +140,16 @@ export function TaskChecklist({ siteId, initialTasks }: TaskChecklistProps) {
           onChange={(e) => setNewTitle(e.target.value)}
           placeholder="作業名（例: 給水工事）"
           className="h-14 text-lg"
+          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
         />
         <Button
           size="lg"
           onClick={handleAdd}
-          disabled={!newTitle.trim()}
+          disabled={!newTitle.trim() || loadingId === "add"}
           className="w-full min-h-[56px] text-lg tap-scale"
         >
           <Plus className="mr-2 h-6 w-6" />
-          作業を追加
+          {loadingId === "add" ? "追加中..." : "作業を追加"}
         </Button>
       </div>
     </div>

@@ -85,6 +85,6 @@
   }
 
   .tap-scale {
-    @apply transition-transform active:scale-[0.97];
+    @apply transition-transform duration-75 active:scale-[0.97];
   }
 }

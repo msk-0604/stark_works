@@ -37,7 +37,7 @@ export function TodaySchedule({ schedules }: TodayScheduleProps) {
               key={s.id}
               className="rounded-xl border-2 border-slate-300 bg-white p-4"
             >
-              <Link href={`/sites/${s.site_id}`} className="tap-scale block">
+              <Link href={`/sites/${s.site_id}`} prefetch className="tap-scale block">
                 <div className="flex items-start justify-between gap-2">
                   <div className="space-y-2">
                     <p className="text-2xl font-bold text-primary">

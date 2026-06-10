@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
 
@@ -9,6 +9,7 @@ import { deleteSchedule } from "@/lib/actions/schedules";
 import { Button } from "@/components/ui/button";
 import type { Schedule, Site, Worker } from "@/lib/types/database";
 import { formatDate, formatDateJa, formatTimeRange } from "@/lib/utils/date";
+import { backgroundRefresh } from "@/lib/utils/refresh";
 import { unwrapRelation } from "@/lib/utils/unwrap-relation";
 
 interface ScheduleTodayListProps {
@@ -25,18 +26,24 @@ export function ScheduleTodayList({
   defaultShowForm = false,
 }: ScheduleTodayListProps) {
   const router = useRouter();
+  const [localSchedules, setLocalSchedules] = useState(schedules);
   const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
   const [showForm, setShowForm] = useState(defaultShowForm);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLocalSchedules(schedules);
+  }, [schedules]);
 
   const today = formatDate(new Date());
   const isToday = selectedDate === today;
 
   const daySchedules = useMemo(
     () =>
-      schedules
+      localSchedules
         .filter((s) => s.start_time.startsWith(selectedDate))
         .sort((a, b) => a.start_time.localeCompare(b.start_time)),
-    [schedules, selectedDate]
+    [localSchedules, selectedDate]
   );
 
   function shiftDay(delta: number) {
@@ -47,8 +54,17 @@ export function ScheduleTodayList({
 
   async function handleDelete(id: string) {
     if (!confirm("この予定を削除しますか？")) return;
-    await deleteSchedule(id);
-    router.refresh();
+    const previous = localSchedules;
+    setLocalSchedules((prev) => prev.filter((s) => s.id !== id));
+    setDeletingId(id);
+
+    const result = await deleteSchedule(id);
+    if (!result.success) {
+      setLocalSchedules(previous);
+    } else {
+      backgroundRefresh(router);
+    }
+    setDeletingId(null);
   }
 
   return (
@@ -107,7 +123,7 @@ export function ScheduleTodayList({
           defaultDate={selectedDate}
           onSuccess={() => {
             setShowForm(false);
-            router.refresh();
+            backgroundRefresh(router);
           }}
           onCancel={() => setShowForm(false)}
         />
@@ -129,7 +145,9 @@ export function ScheduleTodayList({
             return (
               <div
                 key={s.id}
-                className="rounded-xl border-2 border-slate-300 bg-white p-5"
+                className={`rounded-xl border-2 border-slate-300 bg-white p-5 transition-opacity ${
+                  deletingId === s.id ? "opacity-50" : ""
+                }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-2">
@@ -147,6 +165,7 @@ export function ScheduleTodayList({
                     size="icon"
                     className="h-12 w-12 shrink-0"
                     onClick={() => handleDelete(s.id)}
+                    disabled={deletingId === s.id}
                     aria-label="削除"
                   >
                     <Trash2 className="h-6 w-6 text-destructive" />
