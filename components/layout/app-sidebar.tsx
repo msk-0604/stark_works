@@ -3,12 +3,13 @@
 import { Calendar, HardHat, Home, Users } from "lucide-react";
 
 import { NavLink } from "@/components/layout/nav-link";
+import { LABELS } from "@/lib/constants/labels";
 
 const navItems = [
   { href: "/dashboard", label: "ホーム", icon: Home },
   { href: "/sites", label: "現場", icon: HardHat },
   { href: "/schedule", label: "予定", icon: Calendar },
-  { href: "/workers", label: "作業員", icon: Users },
+  { href: "/workers", label: LABELS.member, icon: Users },
 ];
 
 export function AppSidebar() {

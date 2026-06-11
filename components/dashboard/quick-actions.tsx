@@ -27,7 +27,7 @@ const actions = [
   },
   {
     href: "/workers",
-    label: "作業員",
+    label: "メンバー",
     desc: "担当者の確認",
     icon: CheckCircle,
     color: "bg-purple-100 text-purple-800",

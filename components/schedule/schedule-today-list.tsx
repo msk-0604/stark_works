@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
 
-import { ScheduleFormWizard } from "@/components/schedule/schedule-form-wizard";
+import { ScheduleQuickForm } from "@/components/schedule/schedule-quick-form";
+import { LABELS } from "@/lib/constants/labels";
 import { deleteSchedule } from "@/lib/actions/schedules";
 import { Button } from "@/components/ui/button";
 import type { Schedule, Site, Worker } from "@/lib/types/database";
@@ -117,7 +118,7 @@ export function ScheduleTodayList({
       </Button>
 
       {showForm && (
-        <ScheduleFormWizard
+        <ScheduleQuickForm
           sites={sites}
           workers={workers}
           defaultDate={selectedDate}
@@ -151,7 +152,9 @@ export function ScheduleTodayList({
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-2">
-                    <p className="text-2xl font-bold">{worker?.full_name ?? "作業員"}</p>
+                    <p className="text-lg text-muted-foreground">
+                      {LABELS.memberShort}: {worker?.full_name ?? "—"}
+                    </p>
                     <p className="text-xl font-bold text-primary">
                       {formatTimeRange(s.start_time, s.end_time)}
                     </p>

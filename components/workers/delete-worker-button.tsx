@@ -21,7 +21,7 @@ export function DeleteWorkerButton({ workerId, workerName }: DeleteWorkerButtonP
 
   return (
     <Button variant="destructive" size="lg" onClick={handleDelete} disabled={loading} className="w-full">
-      {loading ? "削除中..." : "この作業員を削除"}
+      {loading ? "削除中..." : "このメンバーを削除"}
     </Button>
   );
 }

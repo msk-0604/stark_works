@@ -25,9 +25,9 @@ const menuItems = [
   {
     href: "/workers",
     addHref: "/workers/new",
-    addLabel: "作業員を登録",
-    label: "作業員",
-    desc: "担当者の管理",
+    addLabel: "メンバーを追加",
+    label: "メンバー",
+    desc: "チームの一覧",
     icon: Users,
     color: "border-emerald-400 bg-emerald-50 text-emerald-900",
   },

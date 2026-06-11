@@ -1,5 +1,6 @@
 import { EmptyState } from "@/components/shared/empty-state";
 import { WorkerCard } from "@/components/workers/worker-card";
+import { LABELS } from "@/lib/constants/labels";
 import type { WorkerWithOverview } from "@/lib/types/database";
 
 interface WorkerListProps {
@@ -8,7 +9,7 @@ interface WorkerListProps {
 
 export function WorkerList({ workers }: WorkerListProps) {
   if (workers.length === 0) {
-    return <EmptyState message="作業員が登録されていません。新規登録してください。" />;
+    return <EmptyState message={`${LABELS.memberEmpty}。${LABELS.memberAdd}してください。`} />;
   }
 
   return (

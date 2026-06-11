@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Pencil } from "lucide-react";
 
@@ -25,10 +25,16 @@ export function SiteDetailView({ site, initialTasks, initialPhotos }: SiteDetail
   const completed = tasks.filter((t) => t.is_completed).length;
   const progress = calcProgress(completed, tasks.length);
 
+  useEffect(() => {
+    if (window.location.hash === "#tasks") {
+      document.getElementById("tasks")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, []);
+
   return (
     <div className="space-y-5 pb-32 md:pb-5">
       <PageHeader
-        title="現場詳細"
+        title={site.name}
         backHref="/sites"
         action={
           <Button asChild variant="outline" size="lg" className="min-h-[56px] tap-scale">
@@ -40,21 +46,21 @@ export function SiteDetailView({ site, initialTasks, initialPhotos }: SiteDetail
         }
       />
 
-      <SiteHeader site={site} progress={progress} />
-
-      <SiteQuickActions site={site} />
-
       <Card className="border-2 border-primary">
         <CardHeader className="pb-2">
-          <CardTitle className="text-2xl">作業チェックリスト</CardTitle>
+          <CardTitle className="text-2xl">今日の作業</CardTitle>
           <p className="text-lg text-muted-foreground">
-            {completed} / {tasks.length} 完了
+            タップで完了 · {completed} / {tasks.length}
           </p>
         </CardHeader>
         <CardContent>
           <TaskChecklist siteId={site.id} initialTasks={tasks} onTasksChange={setTasks} />
         </CardContent>
       </Card>
+
+      <SiteHeader site={site} progress={progress} />
+
+      <SiteQuickActions site={site} />
 
       <Card className="border-2" id="photos">
         <CardHeader>

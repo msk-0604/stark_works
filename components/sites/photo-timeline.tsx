@@ -3,14 +3,13 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
-import { backgroundRefresh } from "@/lib/utils/refresh";
 import { Camera, Trash2 } from "lucide-react";
 
 import { deletePhoto, uploadPhoto } from "@/lib/actions/photos";
 import { Button } from "@/components/ui/button";
-import { PHOTO_CATEGORY_LABELS, type Photo, type PhotoCategory } from "@/lib/types/database";
+import { PHOTO_CATEGORY_LABELS, type Photo } from "@/lib/types/database";
 import { cn } from "@/lib/utils/cn";
+import { backgroundRefresh } from "@/lib/utils/refresh";
 
 interface PhotoTimelineProps {
   siteId: string;
@@ -23,16 +22,15 @@ function formatTimelineDate(iso: string): string {
   return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日（${days[d.getDay()]}） ${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
-const categoryColors: Record<PhotoCategory, string> = {
+const categoryColors = {
   before: "bg-slate-200 text-slate-800",
   during: "bg-blue-100 text-blue-900",
   after: "bg-emerald-100 text-emerald-900",
-};
+} as const;
 
 export function PhotoTimeline({ siteId, initialPhotos }: PhotoTimelineProps) {
   const router = useRouter();
   const [photos, setPhotos] = useState(initialPhotos);
-  const [uploadCategory, setUploadCategory] = useState<PhotoCategory>("during");
   const [uploading, setUploading] = useState(false);
 
   const sorted = useMemo(
@@ -47,7 +45,7 @@ export function PhotoTimeline({ siteId, initialPhotos }: PhotoTimelineProps) {
     setUploading(true);
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("category", uploadCategory);
+    formData.append("category", "during");
 
     const result = await uploadPhoto(siteId, formData);
     if (result.success) {
@@ -74,24 +72,6 @@ export function PhotoTimeline({ siteId, initialPhotos }: PhotoTimelineProps) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-2">
-        {(["before", "during", "after"] as PhotoCategory[]).map((cat) => (
-          <button
-            key={cat}
-            type="button"
-            onClick={() => setUploadCategory(cat)}
-            className={cn(
-              "tap-scale min-h-[56px] rounded-xl border-2 px-2 text-base font-bold",
-              uploadCategory === cat
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-slate-300 bg-white"
-            )}
-          >
-            {PHOTO_CATEGORY_LABELS[cat]}
-          </button>
-        ))}
-      </div>
-
       <label className="tap-scale flex cursor-pointer">
         <input
           type="file"
@@ -101,14 +81,14 @@ export function PhotoTimeline({ siteId, initialPhotos }: PhotoTimelineProps) {
           onChange={handleUpload}
           disabled={uploading}
         />
-        <div className="flex w-full min-h-[72px] items-center justify-center gap-3 rounded-xl border-2 border-dashed border-primary bg-accent px-4 py-5 text-xl font-bold text-primary">
-          <Camera className="h-8 w-8" />
+        <div className="flex w-full min-h-[80px] items-center justify-center gap-3 rounded-xl border-2 border-primary bg-primary text-2xl font-bold text-primary-foreground">
+          <Camera className="h-9 w-9" />
           {uploading ? "送信中..." : "写真を撮る"}
         </div>
       </label>
 
       {sorted.length === 0 ? (
-        <p className="py-8 text-center text-lg text-muted-foreground">写真はまだありません</p>
+        <p className="py-6 text-center text-lg text-muted-foreground">写真はまだありません</p>
       ) : (
         <div className="relative space-y-0">
           <div className="absolute bottom-4 left-5 top-4 w-1 rounded-full bg-slate-300" aria-hidden />

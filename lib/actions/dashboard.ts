@@ -115,7 +115,7 @@ export async function getTodayPersonnel(): Promise<TodayPersonnel[]> {
     const workerId = s.worker_id;
     const existing = groups.get(workerId) ?? {
       worker_id: workerId,
-      worker_name: worker?.full_name ?? "作業員",
+      worker_name: worker?.full_name ?? "担当",
       worker_phone: worker?.phone ?? null,
       assignments: [],
     };
@@ -171,7 +171,7 @@ export async function getMorningBriefing(): Promise<MorningBriefing> {
     const worker = unwrapRelation(currentOrNext.worker as Worker | Worker[] | null);
     const site = unwrapRelation(currentOrNext.site as Site | Site[] | null);
     nextUp = {
-      worker_name: worker?.full_name ?? "作業員",
+      worker_name: worker?.full_name ?? "担当",
       site_name: site?.name ?? "現場",
       title: currentOrNext.title,
       time_label: formatTimeRange(currentOrNext.start_time, currentOrNext.end_time),

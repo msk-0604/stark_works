@@ -146,7 +146,7 @@ export async function createWorker(formData: FormData): Promise<ActionResult<nev
   });
 
   if (error) {
-    return { success: false, error: toUserFacingDbError("作業員の登録に失敗しました", error) };
+    return { success: false, error: toUserFacingDbError("メンバーの登録に失敗しました", error) };
   }
 
   revalidatePath("/workers");
@@ -183,7 +183,7 @@ export async function updateWorker(id: string, formData: FormData): Promise<Acti
     })
     .eq("id", id);
 
-  if (error) return { success: false, error: "作業員の更新に失敗しました" };
+  if (error) return { success: false, error: "メンバーの更新に失敗しました" };
 
   revalidatePath("/workers");
   revalidatePath("/dashboard");
@@ -198,7 +198,7 @@ export async function deleteWorker(id: string): Promise<ActionResult<never>> {
   const supabase = await createClient();
   const { error } = await supabase.from("workers").update({ is_active: false }).eq("id", id);
 
-  if (error) return { success: false, error: "作業員の削除に失敗しました" };
+  if (error) return { success: false, error: "メンバーの削除に失敗しました" };
 
   revalidatePath("/workers");
   revalidatePath("/dashboard");

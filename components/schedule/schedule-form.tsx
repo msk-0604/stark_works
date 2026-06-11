@@ -52,7 +52,7 @@ export function ScheduleForm({ sites, workers, defaultDate, onSuccess }: Schedul
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="worker_id" className="text-lg">作業員 *</Label>
+        <Label htmlFor="worker_id" className="text-lg">担当 *</Label>
         <select id="worker_id" name="worker_id" className={selectClassName} required>
           <option value="">選んでください</option>
           {workers.map((w) => (
